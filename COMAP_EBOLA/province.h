@@ -14,8 +14,7 @@
 #include <map>
 
 
-// Simulation Parameters
-#define RATE_OF_PRODUCTION 1
+
 
 class province {
 
@@ -23,21 +22,27 @@ public:
     std::vector<city*> cities;
     int cycle;
     unsigned long int factory;
-    province(std::ifstream&);
+    const int rateOfProduction;
+    const int productionLimit;
+    
+    province(std::ifstream&, const int, const int);
+    
     void moveBetweenCities();
     void moveWithinCities();
     void administerTreatment();
     void moveTreatment();
     void updateCycle();
-  
+    void produceMedicine();
 };
 
 
 
 
-province::province(std::ifstream &IN){
-
-    this->cycle = 0;
+province::province(std::ifstream &IN, const int rateOfProduction, const int productionLimit):
+    productionLimit(productionLimit), rateOfProduction(rateOfProduction){
+    
+    factory = 0;
+    cycle = 0;
     city *curr;
     unsigned long int pop,neighborCount,val, numCities;
     unsigned int key, name;
@@ -62,6 +67,7 @@ province::province(std::ifstream &IN){
     }
     
     for(city *c : cities){
+        c->createMedicineShelf((int)cities.size());
         for(auto it = c->dist.begin(); it != c->dist.end(); ++it){
             c->neighbors.push_back(nameForAdress[(*it).first]);
         }
@@ -85,17 +91,28 @@ void province::moveWithinCities() {
     }
 }
 
-void province::administerTreatment(){
-    
+void province::produceMedicine(){
+    factory += rateOfProduction;
 }
-
-void province::moveTreatment(){
-    
-}
-
 
 void province::updateCycle(){
     this->cycle++;
 }
+
+
+// TODO
+void province::administerTreatment(){
+    
+}
+
+// TODO
+void province::moveTreatment(){
+    // If dice is thrown correctly produce medicine
+    
+    // Move medicine in province
+}
+
+
+
 
 #endif

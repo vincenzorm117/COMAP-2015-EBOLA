@@ -29,18 +29,16 @@
 #define INCUBATED_NUM   21
 #define INCUBATED_BOT 1500
 #define INCUBATED_TOP 3000
+#define MOVE_MEDICINE 94
 
 // Display Parameters
 #define WIDTH 23
-#define PRECISION 4
+#define PRECISION 10
 #define PERCENTAGES true
 #define SHOW_INCUBATED false
 
 
-typedef struct{
-    unsigned long int amount;
-    int dest;
-} medicine;
+
 
 class city{
 public:
@@ -55,9 +53,11 @@ public:
     unsigned long int N;
     unsigned long int N0;
     int name;
+    int numCities;
+    
     // TODO:
     std::map<int, city*> shortestPathList;
-    std::vector<medicine> stock;
+    unsigned long int *medicine;
     
     ~city();
     city(unsigned long int, std::map<int,unsigned long int>,int);
@@ -66,15 +66,18 @@ public:
     void moveIndividuals();
     void administerTreatment();
     void moveMedicine();
+    void createMedicineShelf(const int);
 };
 
 
 city::~city(){
     OUT.close();
+    delete [] medicine;
 }
 
 
 city::city(unsigned long int size, std::map<int,unsigned long int> distances, int name){
+    
     OUT.open(std::to_string(name)+".txt");
     N = N0 = size;
     I = BEGIN_SICK * N;
@@ -92,6 +95,11 @@ city::city(unsigned long int size, std::map<int,unsigned long int> distances, in
     }
     
     display(0);
+}
+
+void city::createMedicineShelf(const int size){
+    medicine = new unsigned long int[size];
+    numCities = size;
 }
 
 
@@ -198,14 +206,14 @@ void city::moveIndividuals(){
 
 
 void city::administerTreatment(){
-    if(!stock.empty()){
-        // TODO: administer medicine
-    }
+    
 }
 
 
 void city::moveMedicine(){
-    
+//    for (int i = 0; i < numCities; i++) {
+//        if(medicine[i])
+//    }
 }
 
 

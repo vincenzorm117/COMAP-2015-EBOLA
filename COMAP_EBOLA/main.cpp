@@ -21,17 +21,21 @@
 
 #define INPUT_FILE "guinea.txt"
 
+// Simulation Parameters
+#define RATE_OF_PRODUCTION 200
+#define PRODUCTION_LIMIT 1000
 
 using namespace std;
 
 
-
 int main(int argc, const char * argv[]) {
+    
+    srand((unsigned int)time(0));
     
     ifstream in;
     in.open(INPUT_FILE);
     
-    province p(in);
+    province p(in, RATE_OF_PRODUCTION, PRODUCTION_LIMIT);
     
     for (int i = 0; i < CYCLES; i++) {
 
