@@ -8,23 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		4DE329B71A85C46000571124 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE329B61A85C46000571124 /* main.cpp */; };
+		4DE329D11A86A99F00571124 /* guinea.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329D01A86A98E00571124 /* guinea.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4DE329B11A85C46000571124 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 6;
 			files = (
+				4DE329D11A86A99F00571124 /* guinea.txt in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4DE329B31A85C46000571124 /* COMAP_EBOLA */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = COMAP_EBOLA; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE329B61A85C46000571124 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4DE329D01A86A98E00571124 /* guinea.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = guinea.txt; sourceTree = "<group>"; };
+		4DE329D21A86ACE600571124 /* province.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = province.h; sourceTree = "<group>"; };
+		4DE329D31A86AD0B00571124 /* city.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = city.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +63,9 @@
 			isa = PBXGroup;
 			children = (
 				4DE329B61A85C46000571124 /* main.cpp */,
+				4DE329D31A86AD0B00571124 /* city.h */,
+				4DE329D21A86ACE600571124 /* province.h */,
+				4DE329D01A86A98E00571124 /* guinea.txt */,
 			);
 			path = COMAP_EBOLA;
 			sourceTree = "<group>";
