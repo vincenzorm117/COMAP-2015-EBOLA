@@ -23,12 +23,13 @@
 
 // Simulation Parameters
 #define RATE_OF_PRODUCTION 200
-#define PRODUCTION_LIMIT 1000
+#define PRODUCTION_LIMIT 1
 
 using namespace std;
 
 
 int main(int argc, const char * argv[]) {
+    
     
     srand((unsigned int)time(0));
     
@@ -37,14 +38,23 @@ int main(int argc, const char * argv[]) {
     
     province p(in, RATE_OF_PRODUCTION, PRODUCTION_LIMIT);
     
+    
     for (int i = 0; i < CYCLES; i++) {
-
+        
         p.updateCycle();
         
         p.moveBetweenCities();
         
         p.moveWithinCities();
         
+        // examine these
+        p.administerTreatment();
+        
+        p.moveTreatment();
+        
+        p.produceMedicine();
+        
+        p.receiveMedicine();
     }
     
     
@@ -52,3 +62,9 @@ int main(int argc, const char * argv[]) {
     
     return 0;
 }
+
+
+
+
+
+
