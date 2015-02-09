@@ -3,7 +3,7 @@
 //  COMAP_EBOLA
 //
 //  Created by Vincenzo on 2/7/15.
-//  Copyright (c) 2015 Vincenzo. All rights reserved.
+//  Copyright (c) 2015 Vincenzo and ASDFoster. All rights reserved.
 //
 
 #ifndef COMAP_EBOLA_city_h
