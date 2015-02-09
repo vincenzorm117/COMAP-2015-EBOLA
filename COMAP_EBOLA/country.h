@@ -30,12 +30,12 @@ public:
     unsigned long int vfactory;
     
     const int rateOfProduction;
-    const int mProductionLimit;
-    const int vProductionLimit;
+//    const int mProductionLimit;
+//    const int vProductionLimit;
     
     
-    unsigned long int *medicine;
-    unsigned long int *vaccine;
+//    unsigned long int *medicine;
+//    unsigned long int *vaccine;
     
     // Contructor
     country(std::string, const int, vec params);
@@ -56,8 +56,8 @@ public:
 
 
 country::country(std::string inputFileName, const int rateOfProduction, vec params):
-        vProductionLimit(params.vaccineDaysToWait),
-        mProductionLimit(params.medicineDaysToWait),
+//        vProductionLimit(params.vaccineDaysToWait),
+//        mProductionLimit(params.medicineDaysToWait),
         rateOfProduction(rateOfProduction),
         params(params){
         
@@ -236,7 +236,7 @@ void country::receiveTreatment(){
                 // Distribute medicine and vaccine based on weight
                 c->inMedicine[i] += cities[i]->mweight * mfactory;
                 c->inVaccine[i]  += cities[i]->vweight * vfactory;
-
+                
                 // Clear country's government's medicine stock
                 mfactory = 0;
                 vfactory = 0;
@@ -285,6 +285,7 @@ void country::administerTreatment(){
     // Simulate administering treatment to cities in country
     for(city *c : cities){
         c->administerTreatment();
+
     }
 }
 
@@ -293,7 +294,9 @@ void country::moveTreatment(){
     // Simulate moving medicine across country
     //      (i.e. city to city)
     for (city *c : cities) {
+
         c->moveMedicine();
+   
     }
 }
 

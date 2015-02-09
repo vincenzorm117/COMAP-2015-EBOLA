@@ -20,7 +20,7 @@
 
 // Input files
 #define INPUT_GUINEA        "guinea.txt"
-#define INPUT_GUINEA_BIG    "guineaBIG.txt"
+#define INPUT_GUINEA_BIG    "guineaREAL.txt"
 #define INPUT_LIBERIA       "liberia.txt"
 #define INPUT_SIERRA_LEONE  "sierra_leone.txt"
 #define INPUT_WEST_AFRICA   "west_africa.txt"
@@ -31,8 +31,8 @@
 #define MARKOV_RESULTS "results.txt"
 
 // Simulation Parameters
-#define RATE_OF_PRODUCTION 2000
-#define MARKOV_ITERATIONS 100
+#define RATE_OF_PRODUCTION 200
+#define MARKOV_ITERATIONS 10
 
 using namespace std;
 
@@ -66,6 +66,7 @@ unsigned long int simulation(vec params, string fileName){
         p.moveTreatment();
         p.produceTreatment();
         p.receiveTreatment();
+        
     }
     
     // Number of deaths in simulation are calculated and returned
@@ -78,17 +79,19 @@ unsigned long int simulation(vec params, string fileName){
 
 
 vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
-    
-    unsigned long int dold, dnew, accepted;
+    int invalidParams;
+    unsigned long int dold, dnew, dbest, accepted, outside = 0;
     double quality, randNum;
     
     // Used to adjust parameters and store results respectively
-    vec newparams;
+    vec newparams, bestparams;
     vector<vec> histogram;
     
 
     // Run simulation and store death count in dold
     dold = simulation(params, fileName);
+    dbest = dold;
+    bestparams = params;
 
     // Initialize accepted to 0 (it keeps track of how many times the Markov Chain takes a step)
     accepted = 0;
@@ -97,10 +100,10 @@ vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
     std::uniform_real_distribution<double> qualityDistribution(0.0,1.0);
     std::normal_distribution<double> vWeightStepDistribution(0.0, step.vStep);
     std::normal_distribution<double> mWeightStepDistribution(0.0, step.mStep);
-    std::normal_distribution<int> mWaitStepDistribution(0.0, step.mWaitStep);
-    std::normal_distribution<int> vWaitStepDistribution(0.0, step.vWaitStep);
-    std::normal_distribution<int> mSaveStepDistribution(0.0, step.mSaveStep);
-    std::normal_distribution<int> vSaveStepDistribution(0.0, step.vSaveStep);
+    std::normal_distribution<double> mWaitStepDistribution(0.0, step.mWaitStep);
+    std::normal_distribution<double> vWaitStepDistribution(0.0, step.vWaitStep);
+    std::normal_distribution<double> mSaveStepDistribution(0.0, step.mSaveStep);
+    std::normal_distribution<double> vSaveStepDistribution(0.0, step.vSaveStep);
     std::default_random_engine generator;
     generator.seed((unsigned int)time(0));
     
@@ -109,27 +112,43 @@ vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
 
         // Make a copy of old parameters to alter with step
         newparams = params;
+        invalidParams = 0;
         
         // Add a real normal randomly generator step size to the medicine weights
-        for(map<int, double>::iterator it = params.medicineWeights.begin(); it != params.medicineWeights.end(); it++){
+        for(map<int, double>::iterator it = newparams.medicineWeights.begin(); it != newparams.medicineWeights.end(); it++){
             it->second += mWeightStepDistribution(generator);
+            if (it->second < 0){
+                invalidParams++;
+            }
         }
         
         // Add a real normal randomly generator step size to the vaccine weights
-        for(map<int, double>::iterator it = params.vaccineWeights.begin(); it != params.vaccineWeights.end(); it++){
+        for(map<int, double>::iterator it = newparams.vaccineWeights.begin(); it != newparams.vaccineWeights.end(); it++){
             it->second += vWeightStepDistribution(generator);
+            if (it->second < 0){
+                invalidParams++;
+            }
         }
-        
-        // Add a discrete normal randomly generator step size to each of the integer parameters
-        params.medicineDaysToWait += mWaitStepDistribution(generator);
-        params.vaccineDaysToWait += vWaitStepDistribution(generator);
-        params.medicineSave += mSaveStepDistribution(generator);
-        params.vaccineSave += vSaveStepDistribution(generator);
         
 
         
+        // Add a discrete normal randomly generator step size to each of the integer parameters
+        newparams.medicineDaysToWait += floor(mWaitStepDistribution(generator));
+        newparams.vaccineDaysToWait  += floor(vWaitStepDistribution(generator));
+        newparams.medicineSave       += floor(mSaveStepDistribution(generator));
+        newparams.vaccineSave        += floor(vSaveStepDistribution(generator));
+        
+        if (newparams.medicineDaysToWait < 0 || newparams.vaccineDaysToWait < 0 || newparams.medicineSave < 0 || newparams.vaccineSave < 0){
+            invalidParams++;
+        }
+        
+        if (invalidParams){
+            outside++;
+            continue;
+        }
+        
         // Perform simulation
-        dnew = simulation(params, fileName);
+        dnew = simulation(newparams, fileName);
 
         
         // Compare old death count to new death count
@@ -143,8 +162,9 @@ vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
         // OR if quality is less than the real uniformly distributed random variable randNum
         if( quality <= randNum || 1.0 <= quality){
             
-            if(1 <= quality ){
-                
+            if(dbest > dnew){
+                dbest = dnew;
+                bestparams = newparams;
             }
             
             // Set old settings to the new ones and increment the acceptance count
@@ -159,6 +179,23 @@ vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
     
     // Show acceptance rate
     cout << "Acceptance rate: " << 100.0 * accepted / (double)iter << " %" << endl;
+    cout << "Lowest # of Deaths: " << dbest << endl;
+    
+    
+    for (int k = 0; k < bestparams.vaccineWeights.size(); k++) {
+        cout << bestparams.vaccineWeights[k] << " ";
+    }
+    
+    for (int k = 0; k < bestparams.medicineWeights.size(); k++) {
+        cout << bestparams.medicineWeights[k] << " ";
+    }
+    
+    cout << bestparams.medicineDaysToWait << " ";
+    cout << bestparams.vaccineDaysToWait << " ";
+    cout << bestparams.medicineSave << " ";
+    cout << bestparams.vaccineSave << " ";
+    cout << std::endl;
+    cout << outside << " out of bounds" << std::endl;
     
     
     return histogram;
@@ -171,7 +208,7 @@ int main(int argc, const char * argv[]) {
     srand((unsigned int)time(0));
     
     // Initial parameters of estimation and step parameters for MCMC
-    vec6 steps = (vec6){0.01,0.01,1,1,100,100};
+    vec6 steps = (vec6){1.0,1.0,1,1,10,10};
     vec params;
     
     // Take in number of cities
@@ -182,15 +219,15 @@ int main(int argc, const char * argv[]) {
     
     // Initial values assigned to estimation parameter
     for (int i = 0; i < numCities; i++) {
-        params.vaccineWeights[i] = 1.0/((double)numCities);
-        params.medicineWeights[i] = 1.0/((double)numCities);
+        params.vaccineWeights[i] = 100.0;
+        params.medicineWeights[i] = 100.0;
     }
     
-    params.vaccineDaysToWait = 4;
-    params.medicineDaysToWait = 4;
+    params.vaccineDaysToWait = 5;
+    params.medicineDaysToWait = 5;
     
-    params.medicineSave = 0;
-    params.vaccineSave = 0;
+    params.medicineSave = 1000;
+    params.vaccineSave = 1000;
     
     // MCMC is ran and results retrieved
     vector<vec> results = MCMC(params, MARKOV_ITERATIONS, steps, INPUT_FILE);

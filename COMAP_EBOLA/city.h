@@ -21,9 +21,9 @@
 #define BETA    .285     // .24 - .33
 #define GAMMA   .0708    // .177
 #define CYCLES  (365)
-#define BEGIN_SICK .001
+#define BEGIN_SICK .1
 #define INCUBATED_NUM  10
-#define MIGRATION_K    10000
+#define MIGRATION_K    50000
 
 // Display Parameters
 #define WIDTH 10
@@ -35,10 +35,10 @@
 typedef struct {
     std::map<int, double> vaccineWeights;
     std::map<int, double> medicineWeights;
-    unsigned int medicineDaysToWait;
-    unsigned int vaccineDaysToWait;
-    unsigned int medicineSave;
-    unsigned int vaccineSave;
+    long medicineDaysToWait;
+    long vaccineDaysToWait;
+    long medicineSave;
+    long vaccineSave;
 } vec;
 
 
@@ -124,7 +124,7 @@ city::city(unsigned long int size, std::map<int,unsigned long int> distances, in
     N = N0 = size;
     
     // Could add bool for startsInfected and that property can be manipulated through file ?????????????????????????????????????????
-    if (beginSick){
+    if (isPort){
         I = BEGIN_SICK * N;
         S = (1 - BEGIN_SICK) * N;
     } else{
@@ -132,7 +132,7 @@ city::city(unsigned long int size, std::map<int,unsigned long int> distances, in
         S = N;
     }
     
-    R = D = 0;
+    R = D = V = 0;
     dist = distances;
     
     
@@ -164,6 +164,11 @@ void city::createMedicineShelf(const int size){
     inVaccine    = new unsigned long int[size];
     outVaccine   = new unsigned long int[size];
     
+    bzero(inMedicine, sizeof(inMedicine)*size);
+    bzero(outMedicine, sizeof(outMedicine)*size);
+    bzero(inVaccine, sizeof(inVaccine)*size);
+    bzero(outVaccine, sizeof(outVaccine)*size);
+    
     numCities = size;
 }
 
@@ -179,6 +184,7 @@ void city::display(int cycle){
         OUT << "R= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << (double)R/N0;
         OUT << "D= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << (double)D/N0;
         OUT << "N= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << (double)N/N0;
+        OUT << "V= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << (double)V/N0;
         
     } else {
         
@@ -188,6 +194,7 @@ void city::display(int cycle){
         OUT << "R= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << R;
         OUT << "D= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << D;
         OUT << "N= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << N;
+        OUT << "V= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << V;
         
         if(SHOW_INCUBATED){
             OUT << " | ";
@@ -318,9 +325,8 @@ void city::moveIndividuals(){
 // Some of the vaccines go to people that appear healthy but are incubating the disease
 //      this vaccine is wasted. We calculate how much is wasted first
 void city::administerTreatment(){
-   
-    unsigned long totalExposed = 0, totalVaccinatable;
 
+    unsigned long totalExposed = 0, totalVaccinatable;
     
     //Calculate total number of exposed
     for (int i = 0; i < INCUBATED_NUM; i++){
@@ -333,8 +339,13 @@ void city::administerTreatment(){
     // Throw out vaccines used on people that are already incubating
     if (totalVaccinatable != 0){
         
+        
         inVaccine[name]  -= inVaccine[name]  * totalExposed / totalVaccinatable;
+        
+
     }
+    
+
     
     // If we are out of infected people or vaccinatable people, save some just in case and trade the rest
     if (S == 0 || I == 0){
@@ -342,6 +353,8 @@ void city::administerTreatment(){
         // Check amount of incoming vaccine to weight of amount to save
         //      If passes vaccines are given to most infected and susceptible neighboring city
         if (params.vaccineSave < inVaccine[name]){
+
+
             
             int nodeToSendVaccine = name;
             unsigned long int buff, max = 0;
@@ -354,7 +367,6 @@ void city::administerTreatment(){
                     nodeToSendVaccine = c->name;
                 }
             }
-            
             // Vaccine amount is transfered to other selected city
             outVaccine[nodeToSendVaccine] = inVaccine[name] - params.vaccineSave;
 
@@ -369,6 +381,7 @@ void city::administerTreatment(){
         // Check amount of incoming medicine to weight of amount to save
         //      If passes medicine are given to most infected neighboring city
         if (params.medicineSave < inMedicine[name]){
+
             
             int nodeToSendMedicine = name;
             unsigned long int buff, max = 0;
@@ -382,51 +395,54 @@ void city::administerTreatment(){
                 }
             }
 
-            // Vaccine amount is transfered to other selected city
+            // Medicine amount is transfered to other selected city
             outMedicine[nodeToSendMedicine] = inMedicine[name] - params.medicineSave;
             
             // Keey medicineSave amount in stock
             inMedicine[name] = params.medicineSave;
+
         }
     }
-
+        
     // Apply vaccines if in stock in city
     if (inVaccine[name]){
-        
         //! Used to prevent underflow
         if(S < inVaccine[name]){
             V += S;
             R += S;
             inVaccine[name] -= S;
             S = 0;
+
         } else {
             S -= inVaccine[name];
             V += inVaccine[name];
             R += inVaccine[name];
             inVaccine[name] = 0;
+
         }
         
     }
 
     // Apply Medicine if in stock in city
     if (inMedicine[name]){
-
         //! Used to prevent underflow
         if(I < inMedicine[name]){
             R += I;
             inMedicine[name] -= I;
             I = 0;
+
         } else {
             I -= inMedicine[name];
             R += inMedicine[name];
             inMedicine[name] = 0;
+
         }
     }
+
 }
 
 
 void city::moveMedicine(){
-    
     // Move medicine to neighboring cities
     for(int i = 0; i < numCities; i++){
 
@@ -439,14 +455,16 @@ void city::moveMedicine(){
             
             next[i]->inVaccine[i] += outVaccine[i];
             outVaccine[i] = 0;
+
             
             // Turn incoming medicine into outgoing medicine
             //      so it can be sent out next cycle
             outMedicine[i] = inMedicine[i];
             inMedicine[i] = 0;
-        
+
             outVaccine[i] = inVaccine[i];
             inVaccine[i] = 0;
+            
         }
     }
 }
