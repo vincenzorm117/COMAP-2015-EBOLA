@@ -256,17 +256,20 @@ void country::weightCities(){
     // Store weights for each city and calculate sum of all weights
     for (int i = 0; i < cities.size(); i++){
         
-        basevweight[i] = params.vaccineWeights[i] * cities[i]->I * cities[i]->S / cities[i]->N;
+        basevweight[i] = params.vaccineWeights[i];// * cities[i]->I * cities[i]->S / cities[i]->N;
         sumbasevweight += basevweight[i];
         
-        basemweight[i] = params.medicineWeights[i] * cities[i]->I * cities[i]->S / cities[i]->N;
+        basemweight[i] = params.medicineWeights[i];// * cities[i]->I * cities[i]->S / cities[i]->N;
         sumbasemweight += basemweight[i];
+        
+//        printf("%lu %lu %lu %lf %lf \n", cities[i]->I, cities[i]->S, cities[i]->N, params.medicineWeights[i], basevweight[i]);
     }
     
     // Normalize all weights
     for (int i = 0; i < cities.size(); i++){
         cities[i]->mweight = basemweight[i] / sumbasemweight;
         cities[i]->vweight = basevweight[i] / sumbasevweight;
+//        printf("%lf %lf %lf %lf \n", cities[i]->mweight, cities[i]->vweight, sumbasemweight, sumbasevweight);
     }
 
     // Clean up memory

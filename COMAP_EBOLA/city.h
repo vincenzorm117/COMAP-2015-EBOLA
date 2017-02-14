@@ -17,13 +17,15 @@
 #include <iomanip>
 
 // Simulation Parameters
-#define ALPHA   .1062
-#define BETA    .285     // .24 - .33
-#define GAMMA   .0708    // .177
-#define CYCLES  (365)
-#define BEGIN_SICK .1
+#define ALPHA   .1062    // 0.1062
+#define BETA    .26     // .285
+#define GAMMA   .0708    // .0708
+#define CYCLES  (365*2)
+#define BEGIN_SICK .001
 #define INCUBATED_NUM  10
-#define MIGRATION_K    50000
+#define MIGRATION_K    100000
+#define MIGRATION_FUDGE 500
+#define MIGRATION_FUDGE_STD 100
 
 // Display Parameters
 #define WIDTH 10
@@ -124,7 +126,7 @@ city::city(unsigned long int size, std::map<int,unsigned long int> distances, in
     N = N0 = size;
     
     // Could add bool for startsInfected and that property can be manipulated through file ?????????????????????????????????????????
-    if (isPort){
+    if (name == 12){
         I = BEGIN_SICK * N;
         S = (1 - BEGIN_SICK) * N;
     } else{
@@ -149,6 +151,7 @@ city::city(unsigned long int size, std::map<int,unsigned long int> distances, in
             S = 0;
         }
     }
+
     
     // Show initial values
     display(0);
@@ -164,10 +167,10 @@ void city::createMedicineShelf(const int size){
     inVaccine    = new unsigned long int[size];
     outVaccine   = new unsigned long int[size];
     
-    bzero(inMedicine, sizeof(inMedicine)*size);
+    bzero(inMedicine,  sizeof(inMedicine )*size);
     bzero(outMedicine, sizeof(outMedicine)*size);
-    bzero(inVaccine, sizeof(inVaccine)*size);
-    bzero(outVaccine, sizeof(outVaccine)*size);
+    bzero(inVaccine,   sizeof(inVaccine  )*size);
+    bzero(outVaccine,  sizeof(outVaccine )*size);
     
     numCities = size;
 }
@@ -195,6 +198,7 @@ void city::display(int cycle){
         OUT << "D= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << D;
         OUT << "N= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << N;
         OUT << "V= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << V;
+        OUT << "P= " << std::left << std::fixed << std::setfill(' ') << std::setw(WIDTH) << std::setprecision(PRECISION) << N+D;
         
         if(SHOW_INCUBATED){
             OUT << " | ";
@@ -259,18 +263,25 @@ void city::moveIndividuals(){
     unsigned long int dsdt,dedt,drdt,d;
     long double Mo;
     
+    
+
+    
     // Move people in and out of neighboring cities
     for(city *p : neighbors){
+        
+        std::normal_distribution<double> migrationDist(MIGRATION_FUDGE, MIGRATION_FUDGE_STD);
+        std::default_random_engine generator;
+        generator.seed((unsigned int)time(0));
         
         // Calculate parameters to update group sizes
         d = (long)dist[p->name];
         
         
         //! Used to prevent underflow
-        if(p->I == 0){
+        if(true){//p->I == 0){
             
             // Calculate coefficient of migration out using (N1-I1)(N2-I2) / (d^2 * migrationConstant)
-            Mo = (double)(N - I) * (p->N - p->I) / (double)(d*d*MIGRATION_K);
+            Mo = (double)(N - I) * (p->N - p->I) / (double)(d*d*MIGRATION_K) + abs(migrationDist(generator));
         } else {
             
             // Calculate coefficient of migration out using (N1-I1)(N2-I2) * (I1/I2) / (d^2 * migrationConstant)
@@ -340,7 +351,7 @@ void city::administerTreatment(){
     if (totalVaccinatable != 0){
         
         
-        inVaccine[name]  -= inVaccine[name]  * totalExposed / totalVaccinatable;
+        inVaccine[name]  -= ceil(inVaccine[name]  * (double) totalExposed / totalVaccinatable);
         
 
     }

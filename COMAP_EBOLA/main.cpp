@@ -20,7 +20,6 @@
 
 // Input files
 #define INPUT_GUINEA        "guinea.txt"
-#define INPUT_GUINEA_BIG    "guineaREAL.txt"
 #define INPUT_LIBERIA       "liberia.txt"
 #define INPUT_SIERRA_LEONE  "sierra_leone.txt"
 #define INPUT_WEST_AFRICA   "west_africa.txt"
@@ -31,8 +30,8 @@
 #define MARKOV_RESULTS "results.txt"
 
 // Simulation Parameters
-#define RATE_OF_PRODUCTION 200
-#define MARKOV_ITERATIONS 10
+#define RATE_OF_PRODUCTION 2000
+#define MARKOV_ITERATIONS 10000
 
 using namespace std;
 
@@ -109,6 +108,9 @@ vector<vec> MCMC(vec params, int iter, vec6 step, string fileName){
     
     
     for (int i = 0; i < iter; i++) {
+        if ((i % (iter/10)) == 0){
+            printf("on iteration %d of %d\n", i, iter);
+        }
 
         // Make a copy of old parameters to alter with step
         newparams = params;
@@ -208,7 +210,7 @@ int main(int argc, const char * argv[]) {
     srand((unsigned int)time(0));
     
     // Initial parameters of estimation and step parameters for MCMC
-    vec6 steps = (vec6){1.0,1.0,1,1,10,10};
+    vec6 steps = (vec6){1.0,1.0,0,0,10,10};
     vec params;
     
     // Take in number of cities
@@ -223,8 +225,8 @@ int main(int argc, const char * argv[]) {
         params.medicineWeights[i] = 100.0;
     }
     
-    params.vaccineDaysToWait = 5;
-    params.medicineDaysToWait = 5;
+    params.vaccineDaysToWait = 0;
+    params.medicineDaysToWait = 0;
     
     params.medicineSave = 1000;
     params.vaccineSave = 1000;

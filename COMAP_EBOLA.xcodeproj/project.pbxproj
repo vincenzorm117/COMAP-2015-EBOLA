@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4DE329B71A85C46000571124 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DE329B61A85C46000571124 /* main.cpp */; };
 		4DE329D11A86A99F00571124 /* guinea.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329D01A86A98E00571124 /* guinea.txt */; };
-		4DE329DB1A88897900571124 /* guineaBIG.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329D71A88896800571124 /* guineaBIG.txt */; };
 		4DE329DC1A88897900571124 /* liberia.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329D81A88896800571124 /* liberia.txt */; };
 		4DE329DD1A88897900571124 /* sierra_leone.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329D91A88896800571124 /* sierra_leone.txt */; };
 		4DE329DE1A88897900571124 /* west_africa.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4DE329DA1A88896800571124 /* west_africa.txt */; };
@@ -22,7 +21,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				4DE329DB1A88897900571124 /* guineaBIG.txt in CopyFiles */,
 				4DE329DC1A88897900571124 /* liberia.txt in CopyFiles */,
 				4DE329DD1A88897900571124 /* sierra_leone.txt in CopyFiles */,
 				4DE329DE1A88897900571124 /* west_africa.txt in CopyFiles */,
@@ -38,7 +36,6 @@
 		4DE329D01A86A98E00571124 /* guinea.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = guinea.txt; sourceTree = "<group>"; };
 		4DE329D21A86ACE600571124 /* country.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = country.h; sourceTree = "<group>"; };
 		4DE329D31A86AD0B00571124 /* city.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = city.h; sourceTree = "<group>"; };
-		4DE329D71A88896800571124 /* guineaBIG.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = guineaBIG.txt; sourceTree = "<group>"; };
 		4DE329D81A88896800571124 /* liberia.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = liberia.txt; sourceTree = "<group>"; };
 		4DE329D91A88896800571124 /* sierra_leone.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = sierra_leone.txt; sourceTree = "<group>"; };
 		4DE329DA1A88896800571124 /* west_africa.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = west_africa.txt; sourceTree = "<group>"; };
@@ -78,7 +75,6 @@
 				4DE329D31A86AD0B00571124 /* city.h */,
 				4DE329D21A86ACE600571124 /* country.h */,
 				4DE329D01A86A98E00571124 /* guinea.txt */,
-				4DE329D71A88896800571124 /* guineaBIG.txt */,
 				4DE329D81A88896800571124 /* liberia.txt */,
 				4DE329D91A88896800571124 /* sierra_leone.txt */,
 				4DE329DA1A88896800571124 /* west_africa.txt */,
